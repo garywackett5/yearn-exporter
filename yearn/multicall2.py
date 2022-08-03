@@ -58,8 +58,9 @@ def fetch_multicall(*calls, block: Optional[Block] = None, require_success: bool
             result = multicall2.tryAggregate.call(
                 False, multicall_input, block_identifier=block or 'latest'
             )
-    except ValueError as e:
-        if 'out of gas' in str(e) or 'execution aborted (timeout = 10s)' in str(e):
+    except (requests.HTTPError, ValueError) as e:
+        # These generally mean you're trying to do too much in one call.
+        if 'out of gas' in str(e) or 'request entity too large' in str(e).lower() or 'connection reset by peer' in str(e).lower() or 'execution aborted (timeout = 10s)' in str(e):
             halfpoint = len(calls) // 2
             batch0 = fetch_multicall(*calls[:halfpoint],block=block,require_success=require_success)
             batch1 = fetch_multicall(*calls[halfpoint:],block=block,require_success=require_success)

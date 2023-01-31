@@ -238,8 +238,10 @@ def calculate_simple(vault, gauge: Gauge, samples: ApySamples) -> Apy:
     crv_net_apy = ((1 + crv_net_farmed_apy) * (1 + pool_apy)) - 1
 
     net_apy = crv_net_apy * crv_debt_ratio + cvx_net_apy * cvx_apy_data.cvx_debt_ratio
-
-    boost = y_boost * crv_debt_ratio + cvx_apy_data.cvx_boost * cvx_apy_data.cvx_debt_ratio
+    
+    crv_ratio_1 = y_boost * crv_debt_ratio
+    cvx_ratio_1 = cvx_apy_data.cvx_boost * cvx_apy_data.cvx_debt_ratio
+    boost = crv_ratio_1 + cvx_ratio_1 
 
     # 0.3.5+ should never be < 0% because of management
     if isinstance(vault, VaultV2) and net_apy < 0 and Version(vault.api_version) >= Version("0.3.5"):
